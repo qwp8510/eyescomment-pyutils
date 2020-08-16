@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='eyescomment-pyutils',
+    name='eyescomment_pyutils',
     version='1.0.0',
     description='weichen eyescomment project utils',
     maintainer='weichen',
