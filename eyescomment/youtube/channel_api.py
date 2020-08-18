@@ -4,9 +4,9 @@ from ..api import OwnerApi
 
 
 class ChannelApi(OwnerApi):
-    def __init__(self, host, path):
+    def __init__(self, host, target_path, cache_path):
         super(ChannelApi, self).__init__(
-            host=host, path=path
+            host=host, target_path=target_path, cache_path=cache_path
         )
 
     def get(self, params=None):

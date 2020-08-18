@@ -1,3 +1,4 @@
+import os
 from os.path import join, abspath, dirname, exists
 import logging
 import requests
@@ -63,13 +64,13 @@ class Login(Api):
     userName = 'admin'
     password = 'defaultisnotroot'
 
-    def __init__(self, host, cachePath):
+    def __init__(self, host, cache_path):
         self.host = host
-        self.cachePath = cachePath
-        config_content = Config(join(CURRENT_PATH, 'config.json')).content
+        self.cache_path = cache_path
+        config_content = Config.instance()
         self.userName = config_content.get('API_USERNAME', self.userName)
         self.password = config_content.get('API_PASSWORD', self.password)
-        self.Config = Config(join(cachePath, 'portal.json'))
+        self.Config = Config(join(cache_path, 'portal.json'))
         super(Login, self).__init__(host=host, path='Users/login')
 
     def tokenTimeExpire(self, cacheTime):
@@ -83,33 +84,30 @@ class Login(Api):
             'username': self.userName,
             'password': self.password
         }
-        accessToken = self.post(data=params)['id']
+        access_token = self.post(data=params)['id']
         data = {
             'referenceTime': time.time(),
-            'access_token': accessToken
+            'access_token': access_token
         }
-        self.Config.set_config(data)
-        return accessToken
+        os.makedirs(self.cache_path, exist_ok=True)
+        self.Config.dump(data)
+        return access_token
 
     @property
     def token(self):
-        cacheDir = join(self.cachePath, 'portal.json')
-        if exists(cacheDir):
-            cacheConfig = self.Config.content
-            if not self.tokenTimeExpire(cacheConfig.get('referenceTime', 0)):
-                return cacheConfig['access_token']
-            else:
-                return self.login
-        else:
-            return self.login
+        if exists(self.Config.config_dir):
+            cache_config = self.Config.read()
+            if not self.tokenTimeExpire(cache_config.get('referenceTime', 0)):
+                return cache_config['access_token']
+        return self.login
 
 
 class OwnerApi(Api):
-    def __init__(self, host, path, tokenPath='/tmp/smart_comment'):
-        self.login = Login(host=host, cachePath=tokenPath)
-        super(OwnerApi, self).__init__(host=host, path=path)
+    def __init__(self, host, target_path, cache_path='/tmp/smart_comment'):
+        self.login = Login(host=host, cache_path=cache_path)
+        super(OwnerApi, self).__init__(host=host, path=target_path)
 
-    def update_paramsToken(self, params):
+    def update_params_token(self, params):
         params = params or {}
         params['access_token'] = self.login.token
         return params
@@ -117,7 +115,7 @@ class OwnerApi(Api):
     def get(self, params=None):
         try:
             return super(OwnerApi, self).get(
-                params=self.update_paramsToken(params))
+                params=self.update_params_token(params))
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
@@ -127,7 +125,7 @@ class OwnerApi(Api):
     def post(self, params=None, **kwargs):
         try:
             return super(OwnerApi, self).post(
-                params=self.update_paramsToken(params), **kwargs)
+                params=self.update_params_token(params), **kwargs)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
@@ -145,7 +143,7 @@ class OwnerApi(Api):
 
         try:
             return super(OwnerApi, self).post(
-                id=id, params=self.update_paramsToken(params), json=jsonData)
+                id=id, params=self.update_params_token(params), json=jsonData)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
@@ -163,7 +161,7 @@ class OwnerApi(Api):
 
         try:
             return super(OwnerApi, self).put(
-                id=id, params=self.update_paramsToken(params), json=jsonData)
+                id=id, params=self.update_params_token(params), json=jsonData)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
@@ -181,7 +179,7 @@ class OwnerApi(Api):
 
         try:
             return super(OwnerApi, self).delete(
-                id=id, params=self.update_paramsToken(params), json=jsonData)
+                id=id, params=self.update_params_token(params), json=jsonData)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise

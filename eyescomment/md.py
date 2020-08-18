@@ -48,7 +48,7 @@ class Mongodb():
             self._collection.insert_one(postMessage)
         except Exception as e:
             logger.warning("insert {} to {} collection fail: {}".format(
-                postMessage, self.collection_name), e)
+                postMessage, self.collection_name, e))
 
     def insert_many(self, postMessages):
         """
