@@ -12,7 +12,7 @@ class YoutubeVideo(RegionApi):
             filter_params: filter params.
         """
         self.filter_params = filter_params
-        super(YoutbeVideo, self).__init__(
+        super(YoutubeVideo, self).__init__(
             host=host, target_path='Youtube_videos', cache_path=cache_path)
 
     def __getitem__(self, idx):
