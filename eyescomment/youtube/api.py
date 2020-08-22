@@ -1,7 +1,7 @@
 from ..platform.api import RegionApi
 
 
-class YoutbeVideo(RegionApi):
+class YoutubeVideo(RegionApi):
     """Videos of Youtube Channel from db"""
 
     def __init__(self, host, cache_path, filter_params={}):
