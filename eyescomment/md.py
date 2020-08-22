@@ -1,13 +1,13 @@
 import pymongo
 import logging
-from os.path import join, abspath, dirname
+from os import path
 from requests import Timeout
 
 from .config import Config
 
 
 logger = logging.getLogger(__name__)
-CURRENT_PATH = dirname(abspath(__file__))
+CURRENT_PATH = path.dirname(path.abspath(__file__))
 
 
 class Mongodb():
@@ -22,10 +22,10 @@ class Mongodb():
 
     def _db(self):
         try:
-            mdConfig = Config(join(CURRENT_PATH, 'config.json')).content
+            config = Config.instance()
             cluster = self.mongo_server.format(
-                mdConfig.get('MD_USERNAME'),
-                mdConfig.get('MD_PASSWORD'),
+                config.get('MD_USERNAME'),
+                config.get('MD_PASSWORD'),
                 self.cluster_name
             )
             return pymongo.MongoClient(cluster)[self.db_name]
