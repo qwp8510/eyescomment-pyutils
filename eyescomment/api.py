@@ -12,8 +12,15 @@ logger = logging.getLogger(__name__)
 CURRENT_PATH = dirname(abspath(__file__))
 
 
-class Api():
+class BaseApi():
+    """Base http Api class."""
     def __init__(self, host, path):
+        """
+        Args:
+            host (str): http url host.
+            path (str): http url path.
+
+        """
         self.host = host
         self.path = path
         self.url = host + path
@@ -21,12 +28,6 @@ class Api():
 
     @property
     def sess(self):
-        """Get HTTP session.
-
-        Returns:
-            A `requests.Session` object.
-
-        """
         if not self._sess:
             self._sess = requests.Session()
         return self._sess
@@ -60,7 +61,7 @@ class Api():
         return response.json()
 
 
-class Login(Api):
+class Login(BaseApi):
     userName = 'admin'
     password = 'defaultisnotroot'
 
@@ -102,10 +103,10 @@ class Login(Api):
         return self.login
 
 
-class OwnerApi(Api):
+class Api(BaseApi):
     def __init__(self, host, target_path, cache_path='/tmp/smart_comment'):
         self.login = Login(host=host, cache_path=cache_path)
-        super(OwnerApi, self).__init__(host=host, path=target_path)
+        super(Api, self).__init__(host=host, path=target_path)
 
     def update_params_token(self, params):
         params = params or {}
@@ -113,75 +114,82 @@ class OwnerApi(Api):
         return params
 
     def get(self, params=None):
+        """
+        Args:
+            params: http query.
+
+        """
         try:
-            return super(OwnerApi, self).get(
+            return super(Api, self).get(
                 params=self.update_params_token(params))
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('OwnerApi.get fail {}'.format(e))
+            logger.error('Api.get fail {}'.format(e))
 
     def post(self, params=None, **kwargs):
+        """
+        Args:
+            params: http query.
+
+        """
         try:
-            return super(OwnerApi, self).post(
+            return super(Api, self).post(
                 params=self.update_params_token(params), **kwargs)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('OwnerApi.get fail {}'.format(e))
+            logger.error('Api.get fail {}'.format(e))
 
-    def patch(self, id, params=None, jsonData=None):
+    def patch(self, id, params=None, json_data=None):
         """
         Args:
-            id: primary id,
-            params: params,
-            jsonData: post body encoded to 'application/json'
+            id: primary id.
+            params: http query.
+            json_data: post body encoded to 'application/json'.
 
         """
-
         try:
-            return super(OwnerApi, self).post(
-                id=id, params=self.update_params_token(params), json=jsonData)
+            return super(Api, self).post(
+                id=id, params=self.update_params_token(params), json=json_data)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('OwnerApi.get fail {}'.format(e))
+            logger.error('Api.get fail {}'.format(e))
 
-    def put(self, id, params=None, jsonData=None):
+    def put(self, id, params=None, json_data=None):
         """
         Args:
-            id: primary id,
-            params: params,
-            jsonData: post body encoded to 'application/json'
+            id: primary id.
+            params: http query.
+            json_data: post body encoded to 'application/json'.
 
         """
-
         try:
-            return super(OwnerApi, self).put(
-                id=id, params=self.update_params_token(params), json=jsonData)
+            return super(Api, self).put(
+                id=id, params=self.update_params_token(params), json=json_data)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('OwnerApi.get fail {}'.format(e))
+            logger.error('Api.get fail {}'.format(e))
 
-    def delete(self, id, params=None, jsonData=None):
+    def delete(self, id, params=None, json_data=None):
         """
         Args:
-            id: primary id,
-            params: params,
-            jsonData: post body encoded to 'application/json'
+            id: primary id.
+            params: http query.
+            json_data: post body encoded to 'application/json'.
 
         """
-
         try:
-            return super(OwnerApi, self).delete(
-                id=id, params=self.update_params_token(params), json=jsonData)
+            return super(Api, self).delete(
+                id=id, params=self.update_params_token(params), json=json_data)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('OwnerApi.get fail {}'.format(e))
+            logger.error('Api.get fail {}'.format(e))

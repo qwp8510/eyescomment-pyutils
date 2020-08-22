@@ -10,6 +10,7 @@ setup(
     url='https://github.com/qwp8510/eyescomment-pyutils/',
     packages=[
         'eyescomment',
-        'eyescomment.youtube'
+        'eyescomment.youtube',
+        'eyescomment.platform'
     ]
 )
