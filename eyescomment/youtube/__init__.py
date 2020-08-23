@@ -1,8 +1,8 @@
-from .api import Youtubechannel
+from .api import YoutubeChannel
 from .api import YoutubeVideo
 
 
 __all__ = [
-    'Youtubechannel',
+    'YoutubeChannel',
     'YoutubeVideo'
 ]
