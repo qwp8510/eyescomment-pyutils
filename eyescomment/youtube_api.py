@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import datetime
 from collections import defaultdict
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -130,7 +131,8 @@ class YoutubeApi():
                     'description': snippet['description'],
                     'videoImage': snippet['thumbnails']['default']['url'],
                     'liveBroadcastContent': snippet['liveBroadcastContent'],
-                    'publishedAt': snippet['publishedAt']
+                    'publishedAt': snippet['publishedAt'],
+                    'updateAt': datetime.now().replace(microsecond=0).isoformat()
                 }
                 self.channel_video_detail[result['id']['videoId']].append(
                     detail)
