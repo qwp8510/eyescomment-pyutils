@@ -1,5 +1,5 @@
 import os
-from os.path import join, abspath, dirname, exists
+from os import path
 import logging
 import requests
 import time
@@ -9,7 +9,7 @@ from .config import Config
 
 DEFAULT_TIMEOUT = (15, 15)
 logger = logging.getLogger(__name__)
-CURRENT_PATH = dirname(abspath(__file__))
+CURRENT_PATH = path.dirname(path.abspath(__file__))
 
 
 class BaseApi():
@@ -43,19 +43,19 @@ class BaseApi():
         return response.json()
 
     def patch(self, id, timeout=DEFAULT_TIMEOUT, **kwargs):
-        url = join(self.url, id)
+        url = path.join(self.url, str(id))
         response = self.sess.patch(url, timeout=timeout, **kwargs)
         response.raise_for_status()
         return response.json()
 
     def put(self, id, timeout=DEFAULT_TIMEOUT, *args, **kwargs):
-        url = join(self.url, id)
+        url = path.join(self.url, str(id))
         response = self.sess.put(url, timeout=timeout, *args, **kwargs)
         response.raise_for_status()
         return response.json()
 
     def delete(self, id, timeout=DEFAULT_TIMEOUT, *args, **kwargs):
-        url = join(self.url, id)
+        url = path.join(self.url, str(id))
         response = self.sess.delete(url, timeout=timeout, *args, **kwargs)
         response.raise_for_status()
         return response.json()
@@ -71,7 +71,7 @@ class Login(BaseApi):
         config_content = Config.instance()
         self.userName = config_content.get('API_USERNAME', self.userName)
         self.password = config_content.get('API_PASSWORD', self.password)
-        self.Config = Config(join(cache_path, 'portal.json'))
+        self.Config = Config(path.join(cache_path, 'portal.json'))
         super(Login, self).__init__(host=host, path='Users/login')
 
     def tokenTimeExpire(self, cacheTime):
@@ -96,7 +96,7 @@ class Login(BaseApi):
 
     @property
     def token(self):
-        if exists(self.Config.config_dir):
+        if path.exists(self.Config.config_dir):
             cache_config = self.Config.read()
             if not self.tokenTimeExpire(cache_config.get('referenceTime', 0)):
                 return cache_config['access_token']
@@ -141,24 +141,24 @@ class Api(BaseApi):
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('Api.get fail {}'.format(e))
+            logger.error('Api.post fail {}'.format(e))
 
     def patch(self, id, params=None, json_data=None):
         """
         Args:
             id: primary id.
             params: http query.
-            json_data: post body encoded to 'application/json'.
+            json_data: patch body encoded to 'application/json'.
 
         """
         try:
-            return super(Api, self).post(
+            return super(Api, self).patch(
                 id=id, params=self.update_params_token(params), json=json_data)
         except HTTPError as e:
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('Api.get fail {}'.format(e))
+            logger.error('Api.patch fail {}'.format(e))
 
     def put(self, id, params=None, json_data=None):
         """
@@ -175,7 +175,7 @@ class Api(BaseApi):
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('Api.get fail {}'.format(e))
+            logger.error('Api.pus fail {}'.format(e))
 
     def delete(self, id, params=None, json_data=None):
         """
@@ -192,4 +192,4 @@ class Api(BaseApi):
             if e.response.status_code != 401:
                 raise
         except Exception as e:
-            logger.error('Api.get fail {}'.format(e))
+            logger.error('Api.delete fail {}'.format(e))
