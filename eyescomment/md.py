@@ -11,6 +11,8 @@ CURRENT_PATH = path.dirname(path.abspath(__file__))
 
 
 class Mongodb():
+    collection_mapping = {}
+
     def __init__(self, cluster_name, db_name, collection_name):
         self.mongo_server = \
             'mongodb+srv://{}:{}@{}-erjue.gcp.mongodb.net/test?\
@@ -37,28 +39,31 @@ class Mongodb():
 
     @property
     def _collection(self):
-        return self.db[self.collection_name]
+        self.collection_mapping.setdefault(
+            self.collection_name, self.db[self.collection_name])
+
+        return self.collection_mapping.get(self.collection_name)
 
     def get(self, filter_params={}):
         results = self._collection.find(filter_params)
         return results
 
-    def insert_one(self, postMessage):
+    def insert_one(self, post_message):
         try:
-            self._collection.insert_one(postMessage)
+            self._collection.insert_one(post_message)
         except Exception as e:
             logger.warning("insert {} to {} collection fail: {}".format(
-                postMessage, self.collection_name, e))
+                post_message, self.collection_name, e))
 
-    def insert_many(self, postMessages):
+    def insert_many(self, post_messages):
         """
             insert format: [{ }, { }, ...]
         """
         try:
-            self._collection.insert_many(postMessages)
+            self._collection.insert_many(post_messages)
         except Exception as e:
             logger.warning("insert_many {} to {} collection fail: {}".format(
-                postMessages, self.collection_name, e))
+                post_messages, self.collection_name, e))
 
     def delete_one(self, deleteMessage):
         try:

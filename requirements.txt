@@ -9,3 +9,4 @@ typed-ast==1.4.0
 pymongo==3.10.1
 numpy==1.18.2
 urllib3==1.22
+sysv-ipc==1.0.1
