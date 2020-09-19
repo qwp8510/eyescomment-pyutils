@@ -69,41 +69,42 @@ class YoutubeApi():
             for reply in item['replies']['comments']:
                 self.comment_detail.update({
                     'replyAuthor': reply['snippet']['authorDisplayName'],
-                    'replyText': reply["snippet"]["textDisplay"]
-                })
+                    'replyText': reply["snippet"]["textDisplay"]})
 
-    def load_comment(self, data):
+    def _load_comment(self, data):
         for item in data.get("items", {}):
-            comment = item["snippet"]["topLevelComment"]
-            detail = {
-                'commentId': comment["id"],
-                'videoId': item["snippet"]['videoId'],
-                'author': comment["snippet"]["authorDisplayName"],
-                'text': comment["snippet"]["textDisplay"],
-                'likeCount': comment["snippet"]["likeCount"],
-                'publishedAt': comment["snippet"]["publishedAt"],
-                'updatedAt': comment["snippet"]["updatedAt"],
-                'replyCount': item['snippet']['totalReplyCount']
-            }
-            logger.info(
-                'YoutubeApi.load_comment loading {} comment: {}'.format(
-                    item["snippet"]['videoId'], detail))
-            self.comment_detail[item["snippet"]['videoId']].append(detail)
+            try:
+                comment = item["snippet"]["topLevelComment"]
+                detail = {
+                    'commentId': comment["id"],
+                    'videoId': item["snippet"]['videoId'],
+                    'channelId': comment["snippet"]['authorChannelId']['value'],
+                    'author': comment["snippet"]["authorDisplayName"],
+                    'text': comment["snippet"]["textDisplay"],
+                    'likeCount': comment["snippet"]["likeCount"],
+                    'publishedAt': comment["snippet"]["publishedAt"],
+                    'updatedAt': comment["snippet"]["updatedAt"],
+                    'replyCount': item['snippet']['totalReplyCount']}
+                logger.info(
+                    'YoutubeApi.load_comment loading {} comment: {}'.format(
+                        item["snippet"]['videoId'], detail))
+                self.comment_detail[item["snippet"]['videoId']].append(detail)
             # self.load_comment_replies(item)
+            except Exception as e:
+                logger.error("load_comment fail: {}".format(e))
 
     def gen_comment_by_page(self, params, content):
+        nextPageToken = content.get('nextPageToken')
         try:
-            nextPageToken = content.get('nextPageToken')
             while nextPageToken:
                 params.update({'pageToken': nextPageToken})
                 content = self.get_url_data(self.YOUTUBE_COMMENT_URL, params)
-                self.load_comment(content)
+                self._load_comment(content)
                 nextPageToken = content.get('nextPageToken')
         except KeyboardInterrupt:
             logger.warning("User Aborted the Operation")
         except Exception as e:
-            logger.error(
-                "gen_comment_by_page fail: {}".format(e))
+            logger.error("gen_comment_by_page fail: {}".format(e))
 
     def gen_comment(self, video_id=None, max_result=1):
         self.comment_detail = defaultdict(list)
@@ -112,30 +113,30 @@ class YoutubeApi():
             'maxResults': max_result,
             'videoId': video_id,
             'textFormat': 'plainText',
-            'key': self.apiKey
-        }
+            'key': self.apiKey}
         content = self.get_url_data(self.YOUTUBE_COMMENT_URL, params)
-        self.load_comment(content)
+        self._load_comment(content)
         self.gen_comment_by_page(params, content)
         return self.comment_detail
 
-    def load_channel_video(self, data):
+    def _load_channel_video(self, data):
         for result in data.get('items', {}):
-            if result["id"]["kind"] == "youtube#video":
-                snippet = result['snippet']
-                detail = {
-                    'videoId': result['id']['videoId'],
-                    'channelName': snippet['channelTitle'],
-                    'channelId': snippet['channelId'],
-                    'videoName': snippet['title'],
-                    'description': snippet['description'],
-                    'videoImage': snippet['thumbnails']['default']['url'],
-                    'liveBroadcastContent': snippet['liveBroadcastContent'],
-                    'publishedAt': snippet['publishedAt'],
-                    'updateAt': datetime.now().replace(microsecond=0).isoformat()
-                }
-                self.channel_video_detail[result['id']['videoId']].append(
-                    detail)
+            try:
+                if result["id"]["kind"] == "youtube#video":
+                    snippet = result['snippet']
+                    detail = {
+                        'videoId': result['id']['videoId'],
+                        'channelName': snippet['channelTitle'],
+                        'channelId': snippet['channelId'],
+                        'videoName': snippet['title'],
+                        'description': snippet['description'],
+                        'videoImage': snippet['thumbnails']['default']['url'],
+                        'liveBroadcastContent': snippet['liveBroadcastContent'],
+                        'publishedAt': snippet['publishedAt'],
+                        'updateAt': datetime.now().replace(microsecond=0).isoformat()}
+                    self.channel_video_detail[result['id']['videoId']].append(detail)
+            except Exception as e:
+                logger.error("load_comment fail: {}".format(e))
 
     def gen_video_by_page(self, params, content):
         try:
@@ -143,13 +144,12 @@ class YoutubeApi():
             while nextPageToken:
                 params.update({'pageToken': nextPageToken})
                 content = self.get_url_data(self.YOUTUBE_SEARCH_URL, params)
-                self.load_channel_video(content)
+                self._load_channel_video(content)
                 nextPageToken = content.get('nextPageToken')
         except KeyboardInterrupt:
             logger.warning("User Aborted the Operation")
         except Exception as e:
-            logger.error(
-                "gen_video_by_page fail: {}".format(e))
+            logger.error("gen_video_by_page fail: {}".format(e))
 
     def gen_channel_video(self, channel_id, max_result=1):
         self.channel_video_detail = defaultdict(list)
@@ -157,10 +157,9 @@ class YoutubeApi():
             'part': 'id,snippet',
             'channelId': channel_id,
             'maxResults': max_result,
-            'key': self.apiKey
-        }
+            'key': self.apiKey}
         content = self.get_url_data(self.YOUTUBE_SEARCH_URL, params)
-        self.load_channel_video(content)
+        self._load_channel_video(content)
         self.gen_video_by_page(params, content)
         logger.info('gen_channel_video: {}'.format(self.channel_video_detail))
         return self.channel_video_detail
