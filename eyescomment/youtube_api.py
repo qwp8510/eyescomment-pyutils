@@ -127,7 +127,6 @@ class YoutubeApi():
                     detail = {
                         'videoId': result['id']['videoId'],
                         'channelName': snippet['channelTitle'],
-                        'channelId': snippet['channelId'],
                         'videoName': snippet['title'],
                         'description': snippet['description'],
                         'videoImage': snippet['thumbnails']['default']['url'],
