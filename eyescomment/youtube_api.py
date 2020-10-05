@@ -78,7 +78,7 @@ class YoutubeApi():
                 detail = {
                     'commentId': comment["id"],
                     'videoId': item["snippet"]['videoId'],
-                    'channelId': comment["snippet"]['authorChannelId']['value'],
+                    'authorChannelId': comment["snippet"]['authorChannelId']['value'],
                     'author': comment["snippet"]["authorDisplayName"],
                     'text': comment["snippet"]["textDisplay"],
                     'likeCount': comment["snippet"]["likeCount"],
@@ -127,6 +127,7 @@ class YoutubeApi():
                     detail = {
                         'videoId': result['id']['videoId'],
                         'channelName': snippet['channelTitle'],
+                        'channelId': snippet['channelId'],
                         'videoName': snippet['title'],
                         'description': snippet['description'],
                         'videoImage': snippet['thumbnails']['default']['url'],
