@@ -47,7 +47,7 @@ class RedisHelper():
 
     def update(self, key, value):
         """ Redis set """
-        self.redis.set(name=self._get_key_name(key), value=json.dumps(value))
+        self.redis.set(name=self._get_key_name(key), value=json.dumps(value, ensure_ascii=False))
 
     def get_list(self, key, start=0, end=-1):
         """ Return Redis list value of key
@@ -62,4 +62,4 @@ class RedisHelper():
 
     def update_list(self, key, value):
         """ Redis lpush """
-        self.redis.lpush(self._get_key_name(key), json.dumps(value))
+        self.redis.lpush(self._get_key_name(key), json.dumps(value, ensure_ascii=False))
