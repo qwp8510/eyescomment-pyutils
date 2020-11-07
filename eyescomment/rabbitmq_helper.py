@@ -59,7 +59,7 @@ class RabbitMqBase():
 
 class RabbitMqFanout(RabbitMqBase):
     """ Rabbitmq Fanout instance"""
-    def __init__(self, host='localhost', exchange='log', exchange_type='fanout'):
+    def __init__(self, host='localhost', exchange='log'):
         """ Rabbitmq Fanout contructor
 
         Args:
@@ -70,7 +70,7 @@ class RabbitMqFanout(RabbitMqBase):
         """
         super().__init__(host=host)
         self.exchange = exchange
-        self.exchange_type = exchange_type
+        self.exchange_type = 'fanout'
         self._queue_name = None
 
     def _declare(self):
