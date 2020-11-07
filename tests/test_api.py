@@ -20,6 +20,19 @@ def test_get_login_access_token():
     assert login.url == path.join(login.host, 'Users/login')
 
 
+def test_api_get_access_token():
+    Config.set_dir(path.join(CURRENT_PATH, 'config.json'))
+    api = Api(
+        host=Config.instance().get('PORTAL_SERVER'),
+        target_path='Youtube_channels',
+        cache_path=Config.instance().get('CACHE_DIR'))
+    filter_params = {'where': {'channelId': 'UC6FcYHEm7SO1jpu5TKjNXEA'}}
+    params = api.update_params_token(params=filter_params)
+    assert isinstance(params, dict)
+    assert params.get('where') == {'channelId': 'UC6FcYHEm7SO1jpu5TKjNXEA'}
+    valid_access_token(params.get('access_token'))
+
+
 def test_api_get():
     TGOP_channel_data = {
         "id": 1,

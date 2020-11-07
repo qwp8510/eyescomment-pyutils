@@ -41,7 +41,6 @@ class YoutubeChannel(RegionApi):
             host=host, target_path='Youtube_channels', cache_path=cache_path)
         self.channels_detail = self.get(params=self.filter_params)
 
-
     def push(self, data):
         super(YoutubeChannel, self).push(data=data)
 
