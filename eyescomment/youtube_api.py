@@ -12,7 +12,8 @@ API_KEY = [
     'AIzaSyCGokxpLFG-7M259tOp7-q7fsqYKqvmQNE',
     'AIzaSyD08pO1kEyZ1t7RXQuAyUFlOTyJO68FZYg',
     'AIzaSyBOWzgpes4ryDn0BHthJjj7vcGr1VlpndA',
-    'AIzaSyBaFMdTVrz6pJhSosmWNMaailKVWElkjIw'
+    'AIzaSyBaFMdTVrz6pJhSosmWNMaailKVWElkjIw',
+    'AIzaSyCx8Lhnb81d1pp9CbFE_mPL-ql6Hicoe2E'
 ]
 
 
@@ -21,8 +22,8 @@ class YoutubeApi():
     YOUTUBE_SEARCH_URL = 'https://www.googleapis.com/youtube/v3/search'
     YOUTUBE_VIDEO_URL = 'https://www.youtube.com/watch?v='
 
-    def __init__(self, apiKey):
-        self.apiKey = apiKey
+    def __init__(self, api_key):
+        self.api_key = api_key
 
     def update_param_api_key(self, url, param):
         logger.warning('Youtube.Api.update param api key')
@@ -113,7 +114,7 @@ class YoutubeApi():
             'maxResults': max_result,
             'videoId': video_id,
             'textFormat': 'plainText',
-            'key': self.apiKey}
+            'key': self.api_key}
         content = self.get_url_data(self.YOUTUBE_COMMENT_URL, params)
         self._load_comment(content)
         self.gen_comment_by_page(params, content)
@@ -157,7 +158,7 @@ class YoutubeApi():
             'part': 'id,snippet',
             'channelId': channel_id,
             'maxResults': max_result,
-            'key': self.apiKey}
+            'key': self.api_key}
         content = self.get_url_data(self.YOUTUBE_SEARCH_URL, params)
         self._load_channel_video(content)
         self.gen_video_by_page(params, content)
