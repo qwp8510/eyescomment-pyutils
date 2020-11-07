@@ -1,4 +1,3 @@
-import pytest
 from os import path
 
 from eyescomment.api import Login, Api

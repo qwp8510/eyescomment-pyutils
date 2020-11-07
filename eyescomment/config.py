@@ -1,4 +1,4 @@
-from __init__ import get_json_content
+from . import get_json_content
 
 
 class Config():
