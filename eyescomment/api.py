@@ -62,21 +62,18 @@ class BaseApi():
 
 
 class Login(BaseApi):
-    userName = 'admin'
-    password = 'defaultisnotroot'
-
     def __init__(self, host, cache_path):
         self.host = host
         self.cache_path = cache_path
         config_content = Config.instance()
-        self.userName = config_content.get('API_USERNAME', self.userName)
-        self.password = config_content.get('API_PASSWORD', self.password)
+        self.userName = config_content.get('API_USERNAME', 'USERNAME_NEEDED')
+        self.password = config_content.get('API_PASSWORD', 'PASSWORD_NEEDED')
         self.Config = Config(path.join(cache_path, 'portal.json'))
         super(Login, self).__init__(host=host, path='Users/login')
 
-    def tokenTimeExpire(self, cacheTime):
+    def token_time_expire(self, cache_time):
         # 604800 = one week
-        if abs(time.time() - cacheTime) >= 604800:
+        if abs(time.time() - cache_time) >= 604800:
             return True
 
     @property
@@ -98,7 +95,7 @@ class Login(BaseApi):
     def token(self):
         if path.exists(self.Config.config_dir):
             cache_config = self.Config.read()
-            if not self.tokenTimeExpire(cache_config.get('referenceTime', 0)):
+            if not self.token_time_expire(cache_config.get('referenceTime', 0)):
                 return cache_config['access_token']
         return self.login
 
