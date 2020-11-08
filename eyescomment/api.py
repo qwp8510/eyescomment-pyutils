@@ -5,7 +5,7 @@ import requests
 import time
 from requests.exceptions import HTTPError
 from .config import Config
-
+from . import get_json_content, dump_json_content
 
 DEFAULT_TIMEOUT = (15, 15)
 logger = logging.getLogger(__name__)
@@ -65,10 +65,10 @@ class Login(BaseApi):
     def __init__(self, host, cache_path):
         self.host = host
         self.cache_path = cache_path
+        self.cache_file_dir = path.join(cache_path, 'portal.json')
         config_content = Config.instance()
         self.userName = config_content.get('API_USERNAME', 'USERNAME_NEEDED')
         self.password = config_content.get('API_PASSWORD', 'PASSWORD_NEEDED')
-        self.Config = Config(path.join(cache_path, 'portal.json'))
         super(Login, self).__init__(host=host, path='Users/login')
 
     def token_time_expire(self, cache_time):
@@ -88,13 +88,13 @@ class Login(BaseApi):
             'access_token': access_token
         }
         os.makedirs(self.cache_path, exist_ok=True)
-        self.Config.dump(data)
+        dump_json_content(self.cache_file_dir, data)
         return access_token
 
     @property
     def token(self):
-        if path.exists(self.Config.config_dir):
-            cache_config = self.Config.read()
+        if path.exists(self.cache_file_dir):
+            cache_config = get_json_content(self.cache_file_dir)
             if not self.token_time_expire(cache_config.get('referenceTime', 0)):
                 return cache_config['access_token']
         return self.login
