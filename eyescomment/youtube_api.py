@@ -6,15 +6,10 @@ from urllib.parse import urlencode
 from urllib.request import urlopen
 from urllib.error import HTTPError
 
+from .config import Config
+
 
 logger = logging.getLogger(__name__)
-API_KEY = [
-    'AIzaSyCGokxpLFG-7M259tOp7-q7fsqYKqvmQNE',
-    'AIzaSyD08pO1kEyZ1t7RXQuAyUFlOTyJO68FZYg',
-    'AIzaSyBOWzgpes4ryDn0BHthJjj7vcGr1VlpndA',
-    'AIzaSyBaFMdTVrz6pJhSosmWNMaailKVWElkjIw',
-    'AIzaSyCx8Lhnb81d1pp9CbFE_mPL-ql6Hicoe2E'
-]
 
 
 class YoutubeApi():
@@ -40,7 +35,7 @@ class YoutubeApi():
                 logger.error(
                     'update_param_api_key fail Exception {}'.format(e))
 
-        for key in API_KEY:
+        for key in Config.instance().get('YOUTUBE_API_KEYS', []):
             param.update({'key': key})
             if check_http():
                 return param
