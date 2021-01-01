@@ -73,9 +73,11 @@ class Mongodb():
             logger.warning('delete {} to {} collection fail: {}'.format(
                 deleteMessage, self.collection_name, e))
 
-    def update_one(self, updateMessage):
+    def update_one(self, filter_obj, update_message):
+        def _enrich_message():
+            return {"$set": update_message}
         try:
-            self._collection.update_one(updateMessage)
+            self._collection.update_one(filter_obj, _enrich_message())
         except Exception as e:
             logger.warning("update {} to {} collection fail: {}".format(
-                updateMessage, self.collection_name, e))
+                update_message, self.collection_name, e))
