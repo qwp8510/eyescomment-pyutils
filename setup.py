@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='eyescomment_pyutils',
-    version='1.1.2',
+    version='1.1.3',
     description='weichen eyescomment project utils',
     maintainer='weichen',
     maintainer_email='a4703706@gmail.com',
