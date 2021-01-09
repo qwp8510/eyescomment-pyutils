@@ -14,9 +14,7 @@ class Mongodb():
     collection_mapping = {}
 
     def __init__(self, cluster_name, db_name, collection_name):
-        self.mongo_server = \
-            'mongodb+srv://{}:{}@{}-erjue.gcp.mongodb.net/test?\
-            retryWrites=true&w=majority'
+        self.mongo_connection = 'mongodb://{username}:{password}@{ipaddress}:27017'
         self.cluster_name = cluster_name
         self.db_name = db_name
         self.collection_name = collection_name
@@ -25,12 +23,12 @@ class Mongodb():
     def _db(self):
         try:
             config = Config.instance()
-            cluster = self.mongo_server.format(
-                config.get('MD_USERNAME'),
-                config.get('MD_PASSWORD'),
-                self.cluster_name
+            connection = self.mongo_connection.format(
+                username=config.get('MD_USERNAME'),
+                password=config.get('MD_PASSWORD'),
+                ipaddress=config.get('MD_HOST')
             )
-            return pymongo.MongoClient(cluster)[self.db_name]
+            return pymongo.MongoClient(connection)[self.db_name]
         except Timeout:
             logger.error('connect Mongodb with {} {} fail'.format(
                 self.cluster_name, self.db_name))
