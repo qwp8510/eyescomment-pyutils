@@ -42,9 +42,13 @@ class Mongodb():
 
         return self.collection_mapping.get(self.collection_name)
 
-    def get(self, filter_params={}):
-        results = self._collection.find(filter_params)
-        return results
+    def get(self, filter_params={}, no_cursor_timeout=False):
+        """
+            no_cursor_timeout(bool): \
+                default is false, it'll be closed by server(after 10 minutes of inactivity)
+        """
+        cursor = self._collection.find(filter_params, no_cursor_timeout=no_cursor_timeout)
+        return cursor
 
     def insert_one(self, post_message):
         try:
