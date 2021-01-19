@@ -44,13 +44,21 @@ class Mongodb():
 
     def get(self, filter_params={}, no_cursor_timeout=False):
         """
+        Args:
+            filter_params(dict)
             no_cursor_timeout(bool): \
                 default is false, it'll be closed by server(after 10 minutes of inactivity)
+
         """
         cursor = self._collection.find(filter_params, no_cursor_timeout=no_cursor_timeout)
         return cursor
 
     def insert_one(self, post_message):
+        """
+        Args:
+            post_message(dict)
+
+        """
         try:
             self._collection.insert_one(post_message)
         except Exception as e:
@@ -59,7 +67,9 @@ class Mongodb():
 
     def insert_many(self, post_messages):
         """
-            insert format: [{ }, { }, ...]
+        Args:
+            post_messages(list): insert format: [{ }, { }, ...]
+
         """
         try:
             self._collection.insert_many(post_messages)
@@ -67,15 +77,26 @@ class Mongodb():
             logger.warning("insert_many {} to {} collection fail: {}".format(
                 post_messages, self.collection_name, e))
 
-    def delete_one(self, deleteMessage):
+    def delete_one(self, delete_message):
+        """
+        Args:
+            delete_message(dict): {key: value}
+
+        """
         try:
-            logger.warning('deleting deleteMessage')
-            self._collection.delete_one(deleteMessage)
+            logger.warning('deleting {}'.format(delete_message))
+            self._collection.delete_one(delete_message)
         except Exception as e:
             logger.warning('delete {} to {} collection fail: {}'.format(
-                deleteMessage, self.collection_name, e))
+                delete_message, self.collection_name, e))
 
     def update_one(self, filter_obj, update_message):
+        """
+        Args:
+            filter_obj(dict): A quary that matchs the document to update.
+            update_message(dict): The modifications to apply
+
+        """
         def _enrich_message():
             return {"$set": update_message}
         try:
